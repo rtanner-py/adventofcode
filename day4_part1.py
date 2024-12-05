@@ -40,3 +40,21 @@ def count_occurences(grid, word):
 
 occurences = count_occurences(grid, word)
 print(occurences)
+
+#part 2
+def count_mas(grid):
+    count = 0 
+    for x in range(1,len(grid)-1):
+        for y in range(1,len(grid[1])-1):
+            cross = []
+            if grid[x][y] == "A":
+                cross.append(grid[x-1][y-1])
+                cross.append(grid[x+1][y-1])
+                cross.append(grid[x-1][y+1])
+                cross.append(grid[x+1][y+1])
+                print(cross)
+                if cross.count("M") == 2 and cross.count("S") == 2 and (cross[0] != cross[3]) and (cross[1] != cross[2]):
+                    count += 1
+    return count
+
+print(count_mas(grid))
