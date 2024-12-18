@@ -1,6 +1,6 @@
-from collections import Counter
+from collections import Counter #https://www.geeksforgeeks.org/python-counter-objects-elements/
 from  datetime import datetime
-from functools import lru_cache
+from functools import lru_cache #https://www.geeksforgeeks.org/python-functools-lru_cache/
 
 @lru_cache(maxsize=None)
 def calculate(item):
@@ -8,7 +8,7 @@ def calculate(item):
         return [1]
     else:
         digits = str(item)
-        mid, odd = divmod(len(digits), 2)
+        mid, odd = divmod(len(digits), 2) #https://www.w3schools.com/python/ref_func_divmod.asp
         if odd:
             return [item * 2024]
         else:
