@@ -1,0 +1,52 @@
+from typing import List, Tuple
+
+test_input = "test_input.txt"
+input = "input.txt"
+
+def draw_garden(input: str) -> List[List[str]]:
+    with open(input) as f:
+        data = f.readlines()
+        garden = [line.strip() for line in data]
+    return garden
+# print(garden) 
+
+directions = [(-1,0),(1,0),(0,-1),(0,1)]
+
+def calculate_area_and_perimeter(garden: List[List[str]], x: int, y: int, visited: bool, planttype: str) -> Tuple[int, int ]:
+    rows = len(garden)
+    cols = len(garden[0])
+    if (x < 0 or x >= rows or y < 0 or y > cols or
+        visited[x][y] or garden[x][y] != planttype):
+            return 0,0
+    
+    visited[x][y] = True
+    area = 1
+    perimeter = 0
+    
+    for dx, dy in directions:
+        nx,ny = x + dx, y + dy
+        if nx < 0 or nx >= rows or ny < 0 or ny >= cols or garden[nx][ny] != planttype:
+            perimeter += 1
+        elif not visited[nx][ny]:
+            sub_area, sub_perimeter = calculate_area_and_perimeter(garden, nx, ny, visited, planttype)
+            area += sub_area
+            perimeter += sub_perimeter
+    
+    return area, perimeter
+
+if __name__ == "__main__":
+    garden = draw_garden(input)
+    #part 1
+    rows, cols = len(garden), len(garden[0])
+    visited = [[False for _ in range(cols)] for _ in range(rows)]
+    regions = []
+    cost = 0 
+    for i in range(rows):
+        for j in range(cols):
+            if not visited[i][j]:
+                planttype = garden[i][j]
+                area, perimeter = calculate_area_and_perimeter(garden, i, j, visited, planttype)
+                regions.append((planttype, area, perimeter))
+    for _, area, perimeter in regions:
+        cost += area * perimeter
+    print(cost)
