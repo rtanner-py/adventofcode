@@ -1,0 +1,105 @@
+from typing import Tuple
+import re
+from functools import reduce
+
+class Robot:
+    def __init__(self, position: Tuple[int, int], velocity: Tuple[int,int], grid: 'Grid'):
+        self.position = position
+        self.x, self.y = map(int,position)
+        self.velocity = velocity
+        self.velocityX, self.velocityY = map(int,velocity)
+        self.grid = grid
+        self.grid.update_positions(None, self.position)
+    
+    def __str__(self) -> None:
+        return f"Position {self.position} - Velocity {self.velocity}"
+
+    def move(self, seconds: int) -> None:
+        for _ in range(seconds):
+            old_position = self.position
+            self.x = (self.x + self.velocityX) % self.grid.cols
+            self.y = (self.y + self.velocityY) % self.grid.rows
+            self.position = (self.x, self.y)     
+            self.grid.update_positions(old_position, self.position)
+            
+    def time_to_reach(self, target_position: Tuple[int,int]) -> int:
+        target_x, target_y = target_position
+        dx = abs(target_x - self.x)
+        dy = abs(target_y - self.y)
+        time_x = dx // abs(self.velocityX) if self.velocityX != 0 else float('inf')
+        time_y = dy // abs(self.velocityY) if self.velocityY != 0 else float('inf')
+        return max(time_x,time_y)
+    
+class Grid:
+    def __init__(self, rows: int, cols: int, fill: str = "."):
+        self.rows = rows
+        self.cols = cols
+        self.grid = [[fill for _ in range(cols)] for _ in range(rows)]
+        self.robot_counts = [[0 for _ in range(cols)] for _ in range(rows)]
+        
+    def __str__(self) -> str:
+        return "\n".join("".join(row) for row in self.grid)
+    
+    def get_self(self, row: int, col: int) -> str:
+        return self.grid[row][col]
+    
+    def set_cell(self, row: int, col: int, value: str) -> None:
+        self.grid[row][col] = value
+    
+    def update_positions(self, old_position: Tuple[int, int], new_position: Tuple[int, int]) -> None:
+        if old_position:
+            old_x, old_y = map(int,old_position)
+            self.robot_counts[old_y][old_x] -= 1
+        
+        if new_position:
+            new_x, new_y = map(int,new_position)
+            self.robot_counts[new_y][new_x] += 1
+    
+    def display_grid(self) -> None:
+        for row in self.robot_counts:
+            print(" ".join(map(str,row)))
+    
+    def robots_in_quadrants(self) -> Tuple[int,int,int,int]:
+        middle_row = self.rows // 2
+        middle_col = self.cols // 2
+        
+        q1 = q2 = q3 = q4 = 0
+        
+        for y in range(self.rows):
+            for x in range(self.cols):
+                if x == middle_col or y == middle_row:
+                    continue
+                if x < middle_col and y < middle_row:
+                    q1 += self.robot_counts[y][x]
+                if x > middle_col and y < middle_row:
+                    q2 += self.robot_counts[y][x] 
+                if x < middle_col and y > middle_row:
+                    q3 += self.robot_counts[y][x]
+                if x > middle_col and y > middle_row:
+                    q4 += self.robot_counts[y][x]            
+        
+        return (q1,q2,q3,q4)     
+    
+def main():
+    grid = Grid(rows=103,cols=101)
+    input = "input.txt"
+    pattern = r"p=(-?\d+),(-?\d+)\s+v=(-?\d+),(-?\d+)"
+    robots = []
+    with open(input) as f:
+        data = f.readlines()
+    for line in data:
+        matches = re.findall(pattern, line.strip())
+        position = tuple((matches[0][0],matches[0][1]))
+        velocity = tuple((matches[0][2],matches[0][3]))
+        robots.append(Robot(position=position, velocity=velocity,grid=grid))
+
+    #part 1
+    for robot in robots:
+        robot.move(seconds=100)
+    print(f"Part 1 answer: {reduce(lambda x, y: x * y, grid.robots_in_quadrants())}")
+    
+
+
+if __name__ == "__main__":
+    main()
+    
