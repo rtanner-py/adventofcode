@@ -1,0 +1,182 @@
+import heapq
+
+class Node():
+    def __init__(self, state, parent, action, cost):
+        self.state = state
+        self.parent = parent
+        self.action = action
+        self.cost = cost
+    
+    def __lt__(self, other):
+        return self.cost < other.cost
+
+class PriorityQueueFrontier():
+    def __init__(self):
+        self.frontier = []
+        self.entry_count = 0
+    
+    def add(self, node):
+        heapq.heappush(self.frontier, (node.cost, self.entry_count, node))
+        self.entry_count += 1
+    
+    def contains_state(self, state):
+        return any(node.state == state for _, _, node in self.frontier)
+    
+    def empty(self):
+        return len(self.frontier) == 0
+    
+    def remove(self):
+        if self.empty():
+            raise Exception("Empty Frontier")
+        return heapq.heappop(self.frontier)[-1]
+           
+
+class Maze():
+    def __init__(self, filename):
+        with open(filename) as f:
+            data = f.read()
+        
+        if data.count("S") != 1 or data.count("E") != 1:
+            raise Exception("Maze must have 1 start point and 1 end point")
+                
+        contents = data.splitlines()
+        self.height = len(contents)
+        self.width = max(len(line) for line in contents)
+        
+        self.walls = []
+        for i in range(self.height):
+            row = []
+            for j in range(self.width):
+                try:
+                    if contents[i][j] == "S":
+                        self.start = (i,j)
+                        row.append(False)
+                    elif contents[i][j] == "E":
+                        self.goal = (i,j)
+                        row.append(False)
+                    elif contents[i][j] == ".":
+                        row.append(False)
+                    else:
+                        row.append(True)
+                except IndexError:
+                    row.append(False)
+            self.walls.append(row)
+        
+        self.solution = None
+        self.directions = ['up','right','down','left']
+        self.change = {
+            'up': (-1,0),
+            'right': (0,1),
+            'down': (1,0),
+            'left': (-1,0)
+        }
+        self.cost = 0
+    
+    def is_valid(self,x,y):
+        return 0 <= x < self.height and 0 <= y < self.width
+    
+    def print(self):
+        solution = self.solution[1] if self.solution is not None else None
+        print()
+        for i, row in enumerate(self.walls):
+            for j, col in enumerate(row):
+                if col:
+                    print("#", end="")
+                elif (i,j) == self.start:
+                    print("S", end="")
+                elif (i,j) == self.goal:
+                    print("E", end="")
+                elif solution is not None and (i,j) in solution:
+                    print("*", end="")
+                else:
+                    print(".", end="")
+            print()
+        print()
+    
+    def move(self, position, direction):
+        row, col = position
+        dx, dy = self.change[direction]
+        return (row + dx, col + dy)
+
+    def solve(self):
+        self.num_explored = 0
+        start = Node(state=(self.start, 'right'), parent=None, action=None, cost=0)
+        frontier = PriorityQueueFrontier()
+        frontier.add(start)
+        
+        self.explored = set()
+        
+        while True:
+            if frontier.empty():
+                raise Exception("No solution")
+            node = frontier.remove()
+            self.num_explored += 1
+            pos, direction = node.state
+            
+            if pos == self.goal:
+                actions = []
+                cells = []
+                cost = 0
+                while node.parent is not None:
+                    actions.append(node.action)
+                    cells.append(node.state[0])
+                    node = node.parent
+                actions.reverse()
+                cells.reverse()
+                self.solution = (actions, cells)
+                return
+            
+            self.explored.add(node.state)
+            
+            next_pos = self.move(pos, direction)
+            if 0 <= next_pos[0] < self.height and 0 <= next_pos[1] < self.width and not self.walls[next_pos[0]][next_pos[1]]:
+                child = Node(
+                    state=(next_pos, direction),
+                    parent=node,
+                    action='move forward',
+                    cost=node.cost + 1
+                )
+                if child.state not in self.explored and not frontier.contains_state(child.state):
+                    frontier.add(child)
+
+            new_direction = self.directions[(self.directions.index(direction) + 1) % 4]
+            child = Node(
+                state=(pos, new_direction),
+                parent=node,
+                action='turn right',
+                cost=node.cost + 1000
+            )
+            if child.state not in self.explored and not frontier.contains_state(child.state):
+                frontier.add(child)
+
+            new_direction = self.directions[(self.directions.index(direction) - 1) % 4]
+            child = Node(
+                state=(pos, new_direction),
+                parent=node,
+                action='turn left',
+                cost=node.cost + 1000
+            )
+            if child.state not in self.explored and not frontier.contains_state(child.state):
+                frontier.add(child)
+        
+    def calculate_cost(self):
+        cost = 0
+        if self.solution is not None:
+            cost += self.solution[0].count("move forward")
+            cost += self.solution[0].count("turn right") * 1000
+            cost += self.solution[0].count("turn left") * 1000
+            return cost
+            
+            
+                
+def main():
+    maze = Maze("test_input.txt")
+    # maze = Maze("input.txt")
+    maze.print()
+    maze.solve()
+    print(f"Explored: {maze.num_explored}")
+    print(f"Cost: {maze.calculate_cost()}")
+                        
+if __name__ == "__main__":
+    main()
+    
