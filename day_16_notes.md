@@ -30,18 +30,18 @@ It uses two lists (open and closed, like Dijkstra): (from geeksforgeeks)
 - Initialised the open and clost lists
 - Put the starting node on open list (leave f at 0)
 - While the open list is not empty
--- find the node with the least f on the open list (q)
--- pop q off the open list
--- generate q's 8 successors and set their parents to q - NOTE THAT IT IS 8 IF YOU CAN MOVE DIAGONALLY. In day 16, it is only 4.
--- for each successor
---- if succesor is goal, stop search
---- else, compute g and h for successor (successor.g = q.g + distance between q and successor; successor.h = disance between successor and goal)
---- successor.f = successor.g + successor.h
---- if a node with the same position as successor is in the open list, which has a lower f than the successor, skip this successor
---- if a node with the same position as successor is in the closed list, which has a lower f than the successor, skip this successor
---- otherwise, add the node to the open list
--- end for loop
--- push q on to the closed list
+    - find the node with the least f on the open list (q)
+    - pop q off the open list
+    - generate q's 8 successors and set their parents to q - NOTE THAT IT IS 8 IF YOU CAN MOVE DIAGONALLY. In day 16, it is only 4.
+    - for each successor
+        - if succesor is goal, stop search
+        - else, compute g and h for successor (successor.g = q.g + distance between q and successor; successor.h = disance between successor and goal)
+        - successor.f = successor.g + successor.h
+        - if a node with the same position as successor is in the open list, which has a lower f than the successor, skip this successor
+        - if a node with the same position as successor is in the closed list, which has a lower f than the successor, skip this successor
+        - otherwise, add the node to the open list
+    - end for loop
+    - push q on to the closed list
 
 ### Dijkstra
 Dijkstra’s algorithm is a shortest-path algorithm that finds the shortest path from a starting node to all other nodes in a graph. 
