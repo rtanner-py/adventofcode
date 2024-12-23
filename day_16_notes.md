@@ -64,7 +64,7 @@ A* vs Greedy Best-First Search: A* guarantees optimality, unlike Greedy Best-Fir
 ## Pseudocode
 
 ### Dijkstra
-<code>
+```
 def dijkstra(start, graph):
     distances = {node: float('inf') for node in graph}
     distances[start] = 0
@@ -92,10 +92,10 @@ def reconstruct_path(previous_nodes, start, goal):
         current_node = previous_nodes[current_node]
     path.append(start)
     return path[::-1]
-</code>
+```
 
 ### A*
-<code>
+```
 def A_star_search(start, goal):
     open_list = PriorityQueue()
     open_list.add(start, 0)
@@ -126,4 +126,4 @@ def reconstruct_path(came_from, current):
         path.append(current)
         current = came_from[current]
     return path[::-1]
-</code>
+```
