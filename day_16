@@ -68,7 +68,7 @@ class Maze():
             'up': (-1,0),
             'right': (0,1),
             'down': (1,0),
-            'left': (-1,0)
+            'left': (0,-1)
         }
         self.cost = 0
     
@@ -170,9 +170,9 @@ class Maze():
             
                 
 def main():
-    maze = Maze("test_input.txt")
-    # maze = Maze("input.txt")
-    maze.print()
+    #maze = Maze("test_input.txt")
+    #maze = Maze("second_test.txt")
+    maze = Maze("input.txt")
     maze.solve()
     print(f"Explored: {maze.num_explored}")
     print(f"Cost: {maze.calculate_cost()}")
