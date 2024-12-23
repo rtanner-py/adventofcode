@@ -32,7 +32,7 @@ It uses two lists (open and closed, like Dijkstra): (from geeksforgeeks)
 - While the open list is not empty
     - find the node with the least f on the open list (q)
     - pop q off the open list
-    - generate q's 8 successors and set their parents to q - NOTE THAT IT IS 8 IF YOU CAN MOVE DIAGONALLY. In day 16, it is only 4.
+    - generate q's 8 successors and set their parents to q  ***Note that 8 references when you can move diagonally in a grid, we only need 4 for day 16***
     - for each successor
         - if succesor is goal, stop search
         - else, compute g and h for successor (successor.g = q.g + distance between q and successor; successor.h = disance between successor and goal)
