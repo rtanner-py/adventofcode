@@ -1,6 +1,6 @@
-#Notes for Day 16 of Advent of Code (2024)
+# Notes for Day 16 of Advent of Code (2024)
 
-##Heap queue (heapq)
+## Heap queue (heapq)
 
 Link: 
 For examples: https://www.geeksforgeeks.org/heap-queue-or-heapq-in-python/
@@ -15,11 +15,11 @@ The order is adjusted, so that heap structure is maintained.
 heappop(heap): This function is used to remove and return the smallest element from the heap. 
 The order is adjusted, so that heap structure is maintained.
 
-##A* Algorithm
+## A* Algorithm
 - Approximates the shortest path in real-life situations (maps and games) where they can be hinderances.
 - Popular technique in path-finding and graph traversals
 
-###Implementation
+### Implementation
 You have a start cell (S) and an end cell (E) and you want to get from S to E as quickly as possible.
 the A* search algorithm works by, at each step, picking the node with the lowest f-value (which is a parameter equal to g + h), and then processes that cell.
 
@@ -43,12 +43,12 @@ It uses two lists (open and closed, like Dijkstra): (from geeksforgeeks)
 -- end for loop
 -- push q on to the closed list
 
-###Dijkstra
+### Dijkstra
 Dijkstra’s algorithm is a shortest-path algorithm that finds the shortest path from a starting node to all other nodes in a graph. 
 It uses a greedy approach, progressively selecting the node with the smallest known distance from the start node. 
 The algorithm does not use heuristics and guarantees the optimal path in graphs with non-negative edge weights.
 
-###Pros and cons
+### Pros and cons
 Pros:
 Guaranteed to find the optimal path if the heuristic is admissible.
 Balances exploration and exploitation using both path cost and heuristic.
@@ -57,13 +57,13 @@ Cons:
 Can be computationally expensive for large search spaces.
 Performance depends heavily on the heuristic function.
 
-###Comparisons
+### Comparisons
 A* vs Dijkstra: A* is more efficient because it uses a heuristic to prioritize nodes, while Dijkstra explores all nodes equally.
 A* vs Greedy Best-First Search: A* guarantees optimality, unlike Greedy Best-First, which may find suboptimal paths.
 
-##Pseudocode
+## Pseudocode
 
-###Dijkstra
+### Dijkstra
 def dijkstra(start, graph):
     distances = {node: float('inf') for node in graph}
     distances[start] = 0
@@ -92,7 +92,7 @@ def reconstruct_path(previous_nodes, start, goal):
     path.append(start)
     return path[::-1]
 
-###A*
+### A*
 def A_star_search(start, goal):
     open_list = PriorityQueue()
     open_list.add(start, 0)
