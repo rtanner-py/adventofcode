@@ -66,64 +66,127 @@ A* vs Greedy Best-First Search: A* guarantees optimality, unlike Greedy Best-Fir
 ### Dijkstra
 ```
 def dijkstra(start, graph):
+    if start not in graph:
+        return None, None
+        
+    # Initialize data structures
     distances = {node: float('inf') for node in graph}
     distances[start] = 0
+    previous_nodes = {node: None for node in graph}
+    visited = set()
     priority_queue = PriorityQueue()
     priority_queue.add(start, 0)
-    previous_nodes = {node: None for node in graph}
-
+    
     while not priority_queue.empty():
         current_node = priority_queue.remove()
-
+        
+        # Skip if we've already processed this node
+        if current_node in visited:
+            continue
+            
+        visited.add(current_node)
+        
+        # Stop if current distance is infinite (unreachable)
+        if distances[current_node] == float('inf'):
+            break
+            
         for neighbor, weight in graph[current_node]:
+            # Skip invalid edges
+            if weight < 0:
+                continue
+                
+            if neighbor not in graph:
+                continue
+                
             tentative_distance = distances[current_node] + weight
+            
             if tentative_distance < distances[neighbor]:
                 distances[neighbor] = tentative_distance
                 previous_nodes[neighbor] = current_node
-                priority_queue.add(neighbor, distances[neighbor])
-
+                
+                # Update priority if node already in queue, otherwise add it
+                if neighbor in priority_queue:
+                    priority_queue.update_priority(neighbor, tentative_distance)
+                else:
+                    priority_queue.add(neighbor, tentative_distance)
+    
     return distances, previous_nodes
 
 def reconstruct_path(previous_nodes, start, goal):
+    if not previous_nodes or goal not in previous_nodes:
+        return None
+        
+    if start not in previous_nodes:
+        return None
+        
     path = []
     current_node = goal
-    while current_node != start:
+    
+    # Check if goal is reachable
+    if previous_nodes[goal] is None and goal != start:
+        return None
+        
+    while current_node is not None:
         path.append(current_node)
         current_node = previous_nodes[current_node]
-    path.append(start)
+        
+        # Detect cycles to prevent infinite loops
+        if current_node in path:
+            return None
+            
+    # Verify the path starts at the correct node
+    if path[-1] != start:
+        return None
+        
     return path[::-1]
 ```
 
 ### A*
 ```
 def A_star_search(start, goal):
+    if not is_valid(start) or not is_valid(goal):
+        return None
+    
+    if start == goal:
+        return [start]
+        
     open_list = PriorityQueue()
     open_list.add(start, 0)
+    closed_set = set()
     came_from = {}
     g_score = {start: 0}
     f_score = {start: heuristic(start, goal)}
 
     while not open_list.empty():
         current = open_list.remove()
-
+        
         if current == goal:
             return reconstruct_path(came_from, current)
+            
+        closed_set.add(current)
 
         for neighbor in neighbors(current):
+            if not is_traversable(neighbor) or neighbor in closed_set:
+                continue
+                
             tentative_g_score = g_score[current] + cost(current, neighbor)
+            
             if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
                 came_from[neighbor] = current
                 g_score[neighbor] = tentative_g_score
                 f_score[neighbor] = g_score[neighbor] + heuristic(neighbor, goal)
+                
                 if neighbor not in open_list:
                     open_list.add(neighbor, f_score[neighbor])
+                else:
+                    open_list.update_priority(neighbor, f_score[neighbor])
 
     return None
 
 def reconstruct_path(came_from, current):
-    path = []
+    path = [current]
     while current in came_from:
-        path.append(current)
         current = came_from[current]
+        path.append(current)
     return path[::-1]
 ```
